@@ -9,6 +9,7 @@ import (
 	. "loan-books/domain"
 )
 
+// getFileContents returns contents of a csv file
 func getFileContents(filepath string) ([][]string, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
@@ -24,6 +25,8 @@ func getFileContents(filepath string) ([][]string, error) {
 	return r.ReadAll()
 }
 
+// GetBanks gets data from file at filepath and returns a slice of pointers to
+// Bank objects
 func GetBanks(filepath string) ([]*Bank, error) {
 	records, err := getFileContents(filepath)
 	if err != nil {
@@ -49,10 +52,11 @@ func GetBanks(filepath string) ([]*Bank, error) {
 
 		banks = append(banks, &Bank{Id: id, Name: record[1]})
 	}
-
 	return banks, nil
 }
 
+// GetCovenants gets data from file at filepath and returns a slice of pointers to
+// Covenant objects
 func GetCovenants(filepath string) ([]*Covenant, error) {
 	records, err := getFileContents(filepath)
 	if err != nil {
@@ -80,6 +84,7 @@ func GetCovenants(filepath string) ([]*Covenant, error) {
 			}
 		}
 
+		maxDefaultLikelihood = 1.0
 		if record[1] != "" {
 			if maxDefaultLikelihood, err = strconv.ParseFloat(record[1], 64); err != nil {
 				return nil, err
@@ -102,6 +107,8 @@ func GetCovenants(filepath string) ([]*Covenant, error) {
 
 }
 
+// GetFacilities gets data from file at filepath and returns a slice of pointers to
+// Facilities objects
 func GetFacilities(filepath string) ([]*Facility, error) {
 	records, err := getFileContents(filepath)
 	if err != nil {
@@ -152,6 +159,8 @@ func GetFacilities(filepath string) ([]*Facility, error) {
 	return facilities, nil
 }
 
+// GetLoans gets data from file at filepath and returns a slice of pointers to
+// Loan objects
 func GetLoans(filepath string) ([]*Loan, error) {
 	records, err := getFileContents(filepath)
 	if err != nil {
