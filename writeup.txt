@@ -1,0 +1,56 @@
+1. How long did you spend working on the problem? What did you find to be the most
+difficult part??
+A: I probably spent about 2~2.5 hours on the code. The problem isn't that
+difficult once you inspect the covenants.csv file which I happened to do. The
+covenants can be tricky if you aren't paying attention to how they are applied.
+
+2. How would you modify your data model or code to account for an eventual
+introduction of new, as-of-yet unknown types of covenants, beyond just
+maximum default likelihood and state restrictions?
+A: I would probably define a trimmer that can be applied on the list of
+covenants to filter out ineligible ones.
+
+3. How would you architect your solution as a production service wherein new facilities
+can be introduced at arbitrary points in time. Assume these facilities become
+available by the finance team emailing your team and describing the addition
+with a new set of CSVs.
+A: I would define a local cache layer of sorts containing a mutex lock for each
+global variables that exist in this solution. The cache layer would get rid
+of the global variables. A background process can make use of mutex lock to lock
+the layer from reads, add the new facility and release the lock.
+
+4. Your solution most likely simulates the streaming process by directly calling a
+method in your code to process the loans inside of a for loop. What would a REST
+API look like for this same service? Stakeholders using the API will need, at a
+minimum, to be able to request a loan be assigned to a facility, and read the
+funding status of a loan, as well as query the capacities remaining in facilities.
+A:
+loans endpoint:
+GET loans/{id}
+POST loans/{id}
+    data: facility_id
+GET loans/{id}/status
+
+facilities endpoint:
+GET facilities/{id}
+GET facilities/{id}/capacities
+
+5. How might you improve your assignment algorithm if you were permitted to
+assign loans in batch rather than streaming? We are not looking for code here,
+but pseudo code or description of a revised algorithm appreciated.
+A: Instead of optimizing lower facility interest rates per loan, we would want
+to do this for the entire batch of loans. One of the ways would be to group
+loans based on state and default_likelihood and then by the loan amount.
+Grouping by state and default_likelihood can help eliminate ineligible
+facilities quickly. Once that is done, we could try funding lower amount loans
+with higher interest rate facilities and higher amount loans with lower interest
+rate facilities to keep overall interest amount we pay the banks to the minimum.
+
+6. Discuss your solution’s runtime complexity.
+A: The worst case runtime complexity is O(mn) where,
+m = number of facilities,
+n = number of covenants per facility
+
+The best case runtime complexity is O(n) where,
+n = number of facilities,
+when each facility has only one covenant
